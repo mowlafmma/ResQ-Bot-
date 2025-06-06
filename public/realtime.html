@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>ResQ Bot - Real-time</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC-N__D9CKgsP5CTNe_Xnf23Qfdebp6zQM&callback=initMap" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000000; /* Nền đen */
+      color: #ffffff;
+    }
+    h1 {
+      text-align: center;
+      margin: 10px 0;
+    }
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+    #video-stream {
+      width: 70%;
+      height: 70%;
+      position: absolute;
+      top: 37%;
+      left: 37%;
+      transform: translate(-50%, -50%);
+      border: 2px solid #ffffff; /* Viền trắng */
+      background-color: #d3d3d3; /* Placeholder */
+    }
+    #video-stream video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    #map {
+      width: 26%;
+      height: 30%;
+      position: absolute;
+      top: 12px;
+      right: 5px;
+      border: 2px solid #ffffff; /* Viền trắng */
+      background-color: #d3d3d3; /* Placeholder */
+    }
+    #info-panel {
+      width: 25%;
+      height: 30%;
+      position: absolute;
+      bottom: 215px;
+      right: 5px;
+      background-color: #333333;
+      padding: 10px;
+      border: 2px solid #ffffff; /* Viền trắng */
+      font-size: 14px;
+      overflow-y: auto; /* Thêm thanh cuộn dọc khi nội dung vượt quá */
+    }
+    #info-panel h3 {
+      margin: 0 0 5px 0;
+      color: #ff0000; /* "Caution" màu đỏ */
+    }
+    #time {
+      color: hsl(0, 8%, 95%); /* Màu đỏ nhạt */
+      font-weight: bold;
+      font-size: 18px; /* Kích thước chữ lớn hơn */
+      background-color: #1a1a1a; /* Nền tối */
+      padding: 5px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    #notification {
+      color: #ffffff;
+      white-space: pre-line; /* Giữ định dạng xuống dòng */
+    }
+    a.button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: white;
+      background-color: #ff0000;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    a.button:hover {
+      background-color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <h1>ResQ Bot - Real-time</h1>
+  <a href="/" class="button">Back to Home</a>
+  <div class="container">
+    <div id="video-stream">
+      <video id="video-feed" controls autoplay>
+        <source src="http://192.168.100.65:5000/hls/stream.m3u8" type="application/x-mpegURL">
+        Trình duyệt của bạn không hỗ trợ phát video.
+      </video>
+    </div>
+    <div id="map"></div>
+    <div id="info-panel">
+      <h3>Caution</h3>
+      <p id="time"></p>
+      <p id="notification"></p>
+    </div>
+  </div>
+  <script>
+    let map;
+    let currentMarker = null; // Biến để theo dõi marker hiện tại
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 10.7769, lng: 106.7009 },
+        zoom: 15,
+      });
+      currentMarker = new google.maps.Marker({
+        position: { lat: 10.7769, lng: 106.7009 },
+        map: map,
+        title: 'Default Location',
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 5,
+          fillColor: '#ff0000',
+          fillOpacity: 1,
+          strokeWeight: 0
+        }
+      });
+      updateGPS();
+    }
+
+    function updateGPS() {
+      fetch('/gps')
+        .then(response => response.json())
+        .then(data => {
+          const position = { lat: data.latitude, lng: data.longitude };
+          map.setCenter(position);
+          if (currentMarker) currentMarker.setMap(null);
+          currentMarker = new google.maps.Marker({
+            position: position,
+            map: map,
+            title: 'Vehicle',
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 5,
+              fillColor: '#ff0000',
+              fillOpacity: 1,
+              strokeWeight: 0
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching GPS:', error));
+      setTimeout(updateGPS, 5000);
+    }
+
+    function updateInfo() {
+      const timeElement = document.getElementById('time');
+      const now = new Date();
+      const d = String(now.getDate()).padStart(2, '0'); // Ngày
+      const m = String(now.getMonth() + 1).padStart(2, '0'); // Tháng
+      const y = String(now.getFullYear()).slice(-2); // Năm (2 chữ số)
+      const h = String(now.getHours()).padStart(2, '0'); // Giờ
+      const min = String(now.getMinutes()).padStart(2, '0'); // Phút
+      const s = String(now.getSeconds()).padStart(2, '0'); // Giây
+      timeElement.textContent = `${d}-${m}-${y} ${h}:${min}:${s} +07`; // Thêm múi giờ +07
+      setTimeout(updateInfo, 1000); // Cập nhật mỗi giây
+    }
+
+    function checkPerson() {
+      const notificationElement = document.getElementById('notification');
+      fetch('/yolo')
+        .then(response => response.json())
+        .then(data => {
+          const message = data.message || "Không phát hiện đối tượng";
+          if (message.toLowerCase().includes('person')) { // Kiểm tra nếu phát hiện "person"
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const timestamp = `${h}:${min}:${s} +07`; // Thêm múi giờ +07
+            const currentText = notificationElement.textContent;
+            const newMessage = `${currentText}${currentText ? '\n' : ''}${timestamp} - Có người`;
+            notificationElement.textContent = newMessage;
+            // Tự động cuộn xuống cuối cùng
+            notificationElement.scrollTop = notificationElement.scrollHeight;
+          }
+        })
+        .catch(error => console.error('Error fetching YOLO:', error));
+      setTimeout(checkPerson, 10000); // Kiểm tra mỗi 1 phút
+    }
+
+    window.onload = () => {
+      updateInfo();
+      checkPerson(); // Bắt đầu kiểm tra YOLO mỗi 1 phút
+      initMap();
+    };
+  </script>
+</body>
+</html>

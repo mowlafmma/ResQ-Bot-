@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>resQ Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    /* CSS cho màn hình chờ */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #2b2828; /* Màu xám cho nền */
+    }
+    .landing-container {
+      text-align: center;
+      background-color: #000000; /* Ô màu đen ở giữa */
+      padding: 60px; /* Tăng 50% từ 40px thành 60px */
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .landing-container h1 {
+      font-size: 72px; /* Tăng 50% từ 48px thành 72px */
+      color: #ffffff;
+      margin: 0;
+    }
+    .landing-container p {
+      font-size: 36px; /* Tăng 50% từ 24px thành 36px */
+      color: #cccccc;
+      margin-bottom: 20px;
+    }
+    .buttons {
+      display: flex;
+      gap: 15px; /* Tăng 50% từ 10px thành 15px */
+      justify-content: center;
+    }
+    .button {
+      padding: 15px 30px; /* Tăng 50% từ 10px 20px thành 15px 30px */
+      font-size: 27px; /* Tăng 50% từ 18px thành 27px */
+      color: white;
+      background-color: #ff0000;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    .button:hover {
+      background-color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-container">
+    <h1>ResQ Bot</h1>
+    <p>Always by your side</p>
+    <div class="buttons">
+      <a href="/realtime" class="button">Real-time</a>
+      <a href="/review" class="button">Review</a>
+    </div>
+  </div>
+</body>
+</html>

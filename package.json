@@ -1,0 +1,15 @@
+{
+  "name": "resq-web",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "concurrently \"node server.js\" \"python app.py\""
+  },
+  "dependencies": {
+    "concurrently": "^9.1.2",
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^3.0.5",
+    "node-rtsp-stream": "^0.0.9",
+    "node-webcam": "^0.8.2"
+  }
+}

@@ -1,19 +1,18 @@
 const express = require('express');
 const path = require('path');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-const flaskTarget = 'http://localhost:5000'; 
 const app = express();
 const port = 3000;
-
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Proxy tới Flask backend
-app.use('/yolo', createProxyMiddleware({ target: 'http://localhost:5000', changeOrigin: true }));
-app.use('/video_feed', createProxyMiddleware({ target: 'http://localhost:5000', changeOrigin: true }));
-app.use('/audio_feed', createProxyMiddleware({ target: 'http://localhost:5000', changeOrigin: true }));
-app.use('/hls', createProxyMiddleware({ target: 'http://localhost:5000', changeOrigin: true }));
+const BACKEND = process.env.BACKEND_URL || 'http://localhost:5000' ;
+app.use('/yolo', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
+app.use('/video_feed', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
+app.use('/audio_feed', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
+app.use('/hls', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
 
 // Dữ liệu GPS
 let gpsData = { latitude: 10.7769, longitude: 106.7009 };
@@ -29,6 +28,6 @@ app.get('/review', (req, res) => res.sendFile(path.join(__dirname, 'public', 're
 app.get('/gps', (req, res) => res.json(gpsData));
 
 // Khởi động server
-app.listen(port, 'localhost', () => {
+app.listen(port, () => {
   console.log(`Web server running at http://localhost:${port}`);
 });

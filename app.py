@@ -65,7 +65,7 @@ def generate_frames():
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/yolo', methods=['GET'])
+@app.route('/yolo', methods=['POST','GET'])
 def yolo():
     print("Gửi phản hồi từ /yolo: person (0.95)")
     return jsonify({"message": "person (0.95)"})
@@ -108,7 +108,7 @@ def start_ffmpeg_stream():
     except Exception as e:
         print(f"Lỗi khởi động FFmpeg: {e}")
 
-@app.route('/hls/<path:filename>')
+@app.route("/hls/<path:filename>")
 def serve_hls(filename):
     file_path = os.path.join(HLS_DIR, filename)
     if os.path.exists(file_path):

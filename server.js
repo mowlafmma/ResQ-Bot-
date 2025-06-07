@@ -9,10 +9,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Proxy tới Flask backend
 const BACKEND = process.env.BACKEND_URL || 'http://localhost:5000' ;
-app.use('/yolo', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
-app.use('/video_feed', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
-app.use('/audio_feed', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
-app.use('/hls', createProxyMiddleware({target:BACKEND, changeOrigin: true }));
+app.use('/yolo', createProxyMiddleware({target: BACKEND, changeOrigin: true, timeout: 0, proxyTimeout: 120000 }));
+app.use('/video_feed', createProxyMiddleware({target: BACKEND, changeOrigin: true, timeout: 0, proxyTimeout: 120000 }));
+app.use('/audio_feed', createProxyMiddleware({target: BACKEND, changeOrigin: true, timeout: 0, proxyTimeout: 120000 }));
+app.use('/hls', createProxyMiddleware({target: BACKEND, changeOrigin: true, timeout: 0, proxyTimeout: 120000 }));
 
 // Dữ liệu GPS
 let gpsData = { latitude: 10.7769, longitude: 106.7009 };
